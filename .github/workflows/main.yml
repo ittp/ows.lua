@@ -1,0 +1,68 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        env:
+          TEST: "test env"
+          TOKEN: ${{ github.secrets.token }}
+        run: echo Hello, world! $TEST; echo $TOKEN
+        
+      - name: Write env file
+        # You may pin to the exact commit or the version.
+        # uses: zxyle/write-env-action@53aa1847218ede7d79980b80e755acbef80d41e1
+        uses: zxyle/write-env-action@v2
+        with:
+          # env file in base64 format
+          env_file_content: | 
+              HOSTNAME=hostname
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
+      - name: Remote SSH Commands
+        # You may pin to the exact commit or the version.
+        # uses: fifsky/ssh-action@58b3c484be9c20cf118fd3b939a6d2cb3c769512
+        uses: fifsky/ssh-action@v0.0.6
+        
+        with:
+          # Command to execute on the remote server.
+          command: ${{ secrets.command }}
+          # Hostname or IP address of the server.
+          host: ${{ secrets.host }} # optional, default is localhost
+          # Username for authentication.
+          user: ${{ secrets.user }} # optional, default is root
+          # Port number of the server.
+          port: ${{ secrets.port }} # optional, default is 22
+          # String that contains a private key for either key-based or hostbased user authentication (OpenSSH format)
+          key: ${{ secrets.key }} # optional
+          # File location to an identity file
+          keyfile: ${{ secrets.keyfile }}# optional
+          # Password for authentication.
+          pass: ${{ secrets.password }} # optional
+          # SSH parameters for example: -tt.
+          args: ${{ secrets.args }} # optional
